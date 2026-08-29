@@ -1,0 +1,22 @@
+# vim: set sts=2 ts=8 sw=2 tw=99 et ft=python:
+import os
+
+if 'tf2' in SM.sdks:
+  sdk = SM.sdks['tf2']
+  
+  binary = SM.HL2Library(builder, 'game.tf2.ext.' + sdk.ext, sdk)
+  binary.sources += [
+		'extension.cpp',
+		'natives.cpp',
+		'RegNatives.cpp',
+		'util.cpp',
+		'criticals.cpp',
+		'holiday.cpp',
+		'teleporter.cpp',
+		'gameplayrules.cpp',
+		'conditions.cpp',
+		'../../public/smsdk_ext.cpp',
+		'../../public/CDetour/detours.cpp',
+		'../../public/asm/asm.c'
+  ]
+  SM.extensions += [builder.Add(binary)]

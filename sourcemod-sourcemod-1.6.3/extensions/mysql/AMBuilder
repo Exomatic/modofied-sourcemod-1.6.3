@@ -1,0 +1,39 @@
+# vim: set sts=2 ts=8 sw=2 tw=99 et ft=python:
+import os
+
+if SM.mysql_root:
+  binary = SM.ExtLibrary(builder, 'dbi.mysql.ext')
+  binary.compiler.cxxincludes += [
+    os.path.join(SM.mysql_root, 'include'),
+    os.path.join(SM.mms_root, 'core', 'sourcehook')
+  ]
+  if binary.compiler.vendor == 'gcc' or binary.compiler.vendor == 'clang':
+    binary.compiler.cxxflags += ['-fno-rtti']
+  elif binary.compiler.vendor == 'msvc':
+    binary.compiler.cxxflags += ['/GR-']
+
+  if builder.target_platform == 'linux' or builder.target_platform == 'mac':
+    binary.compiler.postlink += [
+      os.path.join(SM.mysql_root, 'lib', 'libmysqlclient_r.a'),
+      '-lz',
+      '-lpthread',
+      '-lm'
+    ]
+  elif builder.target_platform == 'windows':
+    binary.compiler.postlink += [
+      os.path.join(SM.mysql_root, 'lib', 'opt', 'mysqlclient.lib'),
+      os.path.join(SM.mysql_root, 'lib', 'opt', 'zlib.lib'),
+      'wsock32.lib'
+    ]
+
+  binary.sources += [
+    '../../public/smsdk_ext.cpp',
+    'mysql/MyBasicResults.cpp',
+    'mysql/MyBoundResults.cpp',
+    'mysql/MyDatabase.cpp',
+    'mysql/MyDriver.cpp',
+    'mysql/MyStatement.cpp',
+    'extension.cpp'
+  ]
+  SM.extensions += [builder.Add(binary)]
+
